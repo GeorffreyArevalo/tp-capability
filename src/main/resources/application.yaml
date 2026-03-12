@@ -1,3 +1,13 @@
 spring:
   application:
     name: capability
+
+server:
+  port: 8081
+
+adapter:
+  clients:
+    timeout: 5000
+    clients:
+      tech:
+        base-url: "http://localhost:8080/api/v1"
