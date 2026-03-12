@@ -8,6 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class CapabilityPath {
 
     private final String capabilities;
-    private String capabilitiesList;
+    private final String capabilitiesList;
 
 }

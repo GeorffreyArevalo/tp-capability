@@ -57,7 +57,7 @@ public class TechnologyMicroserviceClientAdapter implements TechnologyAssociatio
     @Override
     public Flux<TechnologySummary> getTechnologiesByCapabilityId(Long capabilityId) {
         return client.get()
-                .uri(GET_TECHNOLOGIES_URL, capabilityId)
+                .uri(String.format("%s/%s", technologyMicroserviceBaseUrl, GET_TECHNOLOGIES_URL), capabilityId)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
                         response.bodyToMono(String.class).flatMap(body ->
