@@ -1,5 +1,6 @@
 package com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.routes;
 
+import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.docs.CapabilityOpenApi;
 import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.handlers.CapabilityHandler;
 import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.routes.paths.CapabilityPath;
 import lombok.RequiredArgsConstructor;

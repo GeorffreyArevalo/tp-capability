@@ -12,6 +12,7 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 
+@UtilityClass
 public class CapabilityOpenApi {
 
     private static final String TAG = "Capability";
