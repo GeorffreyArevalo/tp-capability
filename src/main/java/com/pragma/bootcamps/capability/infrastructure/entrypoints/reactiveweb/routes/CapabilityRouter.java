@@ -21,6 +21,7 @@ public class CapabilityRouter {
     public RouterFunction<ServerResponse> routerFunction(CapabilityHandler handler) {
         return route()
                 .POST(paths.getCapabilities(), handler::listenSave, CapabilityOpenApi::saveCapability)
+                .GET(paths.getCapabilitiesList(), handler::listenListCapabilities, CapabilityOpenApi::listCapabilities)
                 .build();
     }
 

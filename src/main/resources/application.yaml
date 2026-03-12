@@ -26,6 +26,7 @@ springdoc:
 routes:
   paths:
     capabilities: "/api/v1/capabilities"
+    capabilitiesList: "/api/v1/capabilities/list"
 
 
 
