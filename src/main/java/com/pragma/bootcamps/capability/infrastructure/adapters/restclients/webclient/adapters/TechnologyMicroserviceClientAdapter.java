@@ -1,15 +1,20 @@
 package com.pragma.bootcamps.capability.infrastructure.adapters.restclients.webclient.adapters;
 
 import com.pragma.bootcamps.capability.domain.clients.TechnologyAssociationClientPort;
+import com.pragma.bootcamps.capability.domain.enums.ExceptionMessages;
 import com.pragma.bootcamps.capability.domain.exceptions.CapabilityTechnologiesCountException;
 import com.pragma.bootcamps.capability.domain.exceptions.RepeatedTechnologiesException;
+import com.pragma.bootcamps.capability.domain.exceptions.TechnologyMicroserviceException;
 import com.pragma.bootcamps.capability.domain.exceptions.TechnologyNotFoundException;
+import com.pragma.bootcamps.capability.domain.models.TechnologySummary;
 import com.pragma.bootcamps.capability.infrastructure.adapters.restclients.webclient.dtos.requests.AssociationTechRequest;
+import com.pragma.bootcamps.capability.infrastructure.adapters.restclients.webclient.dtos.responses.TechnologyListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -19,6 +24,7 @@ import java.util.List;
 public class TechnologyMicroserviceClientAdapter implements TechnologyAssociationClientPort {
 
     private static final String ASSOCIATE_TECHNOLOGIES_URL = "/tech/associate";
+    private static final String GET_TECHNOLOGIES_URL = "/tech/capabilities/{capabilityId}/techs";
 
     @Value("${adapter.clients.clients.tech.base-url}")
     private String technologyMicroserviceBaseUrl;
@@ -46,5 +52,21 @@ public class TechnologyMicroserviceClientAdapter implements TechnologyAssociatio
                 )
                 .toBodilessEntity()
                 .then();
+    }
+
+    @Override
+    public Flux<TechnologySummary> getTechnologiesByCapabilityId(Long capabilityId) {
+        return client.get()
+                .uri(GET_TECHNOLOGIES_URL, capabilityId)
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, response ->
+                        response.bodyToMono(String.class).flatMap(body ->
+                                Mono.error(new TechnologyMicroserviceException(
+                                        ExceptionMessages.WEB_CLIENT_INTERNAL_SERVER_ERROR.format(body)
+                                ))
+                        )
+                )
+                .bodyToMono(TechnologyListResponse.class)
+                .flatMapMany(response -> Flux.fromIterable(response.data() != null ? response.data() : List.of()));
     }
 }

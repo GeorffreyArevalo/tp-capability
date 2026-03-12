@@ -9,7 +9,8 @@ public enum ExceptionMessages {
     CAPABILITY_TECHNOLOGIES_REPEATED("There are repeated technologies in the list"),
     TECHNOLOGY_NOT_FOUND("Some technology IDs do not exist"),
     SAGA_COMPENSATION_ASSOCIATION_FAILURE("The capability could not be associated with the selected technologies. Please try again later."),
-    CAPABILITY_ALREADY_EXISTS("A capability with the name '%s' already exists");
+    CAPABILITY_ALREADY_EXISTS("A capability with the name '%s' already exists"),
+    WEB_CLIENT_INTERNAL_SERVER_ERROR("Internal server error in technology microservice.");
 
     private final String message;
 
