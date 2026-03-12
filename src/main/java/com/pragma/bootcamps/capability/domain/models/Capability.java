@@ -18,5 +18,6 @@ public class Capability {
     private String name;
     private String description;
     private List<Long> technologyIds;
+    private Integer technologyCount;
 
 }
