@@ -1,6 +1,7 @@
 package com.pragma.bootcamps.capability.domain.spi;
 
 import com.pragma.bootcamps.capability.domain.models.Capability;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface CapabilityPersistencePort {
@@ -8,5 +9,6 @@ public interface CapabilityPersistencePort {
     Mono<Capability> saveCapability(Capability capability);
     Mono<Void> deleteCapability(Long capabilityId);
     Mono<Capability> findCapabilityByName(String name);
+    Flux<Capability> findCapabilitiesPagedAndSorted(int page, int size, String sortBy, String order);
 
 }

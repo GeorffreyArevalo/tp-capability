@@ -7,8 +7,11 @@ import com.pragma.bootcamps.capability.domain.exceptions.CapabilityAlreadyExists
 import com.pragma.bootcamps.capability.domain.exceptions.CapabilityTechnologiesCountException;
 import com.pragma.bootcamps.capability.domain.exceptions.SagaCompensationException;
 import com.pragma.bootcamps.capability.domain.models.Capability;
+import com.pragma.bootcamps.capability.domain.models.CapabilityWithTechnologies;
 import com.pragma.bootcamps.capability.domain.spi.CapabilityPersistencePort;
+import com.pragma.bootcamps.capability.domain.utils.CapabilityUtils;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -36,6 +39,14 @@ public class CapabilityUseCase implements CapabilityServicePort {
                 )))
                 .flatMap(this::validateUniqueName)
                 .flatMap(this::saveAndAssociateTechnologies);
+    }
+
+    public Flux<CapabilityWithTechnologies> getCapabilitiesWithTechnologies(int page, int size, String sortBy, String order) {
+        return capabilityPersistencePort.findCapabilitiesPagedAndSorted(page, size, sortBy, order)
+                .flatMapSequential(capability -> technologyAssociationClientPort.getTechnologiesByCapabilityId(capability.getId())
+                        .collectList()
+                        .map(techs -> CapabilityUtils.buildCapabilityWithTechnologies(capability, techs))
+                );
     }
 
     private Mono<Capability> validateUniqueName(Capability capability) {
