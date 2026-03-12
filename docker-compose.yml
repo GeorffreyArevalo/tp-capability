@@ -1,0 +1,17 @@
+
+services:
+  db-capability:
+    image: postgres:16.1
+    container_name: db-capability
+    volumes:
+      - capability:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: capability
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5433:5432"
+volumes:
+  capability:
+    external: false
+
