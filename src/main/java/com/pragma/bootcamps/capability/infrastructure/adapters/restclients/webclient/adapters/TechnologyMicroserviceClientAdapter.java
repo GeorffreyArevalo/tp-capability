@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
 
 @Service
@@ -73,11 +75,15 @@ public class TechnologyMicroserviceClientAdapter implements TechnologyAssociatio
 
     @Override
     public Mono<Void> deleteTechnologiesByCapabilityIds(List<Long> capabilityIds) {
+        URI uri = UriComponentsBuilder
+                .fromUriString(technologyMicroserviceBaseUrl)
+                .path(DELETE_TECH_URL)
+                .queryParam("ids", capabilityIds.toArray())
+                .build(true)
+                .toUri();
+
         return client.delete()
-                .uri(uriBuilder -> uriBuilder
-                        .path( String.format("%s%s", technologyMicroserviceBaseUrl, DELETE_TECH_URL) )
-                        .queryParam("ids", capabilityIds)
-                        .build())
+                .uri(uri)
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError, response ->
                         response.bodyToMono(String.class).flatMap(body ->
