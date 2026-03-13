@@ -25,6 +25,7 @@ public class TechnologyMicroserviceClientAdapter implements TechnologyAssociatio
 
     private static final String ASSOCIATE_TECHNOLOGIES_URL = "/tech/associate";
     private static final String GET_TECHNOLOGIES_URL = "/tech/capabilities/{capabilityId}/techs";
+    private static final String DELETE_TECH_URL = "/tech-capabilities";
 
     @Value("${adapter.clients.clients.tech.base-url}")
     private String technologyMicroserviceBaseUrl;
@@ -68,5 +69,23 @@ public class TechnologyMicroserviceClientAdapter implements TechnologyAssociatio
                 )
                 .bodyToMono(TechnologyListResponse.class)
                 .flatMapMany(response -> Flux.fromIterable(response.data() != null ? response.data() : List.of()));
+    }
+
+    @Override
+    public Mono<Void> deleteTechnologiesByCapabilityIds(List<Long> capabilityIds) {
+        return client.delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path( String.format("%s%s", technologyMicroserviceBaseUrl, DELETE_TECH_URL) )
+                        .queryParam("ids", capabilityIds)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError, response ->
+                        response.bodyToMono(String.class).flatMap(body ->
+                                Mono.error(new TechnologyMicroserviceException(
+                                        ExceptionMessages.WEB_CLIENT_INTERNAL_SERVER_ERROR.format(body)))
+                        )
+                )
+                .toBodilessEntity()
+                .then();
     }
 }
