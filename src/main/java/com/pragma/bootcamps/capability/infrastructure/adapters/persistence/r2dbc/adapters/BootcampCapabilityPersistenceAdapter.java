@@ -1,0 +1,35 @@
+package com.pragma.bootcamps.capability.infrastructure.adapters.persistence.r2dbc.adapters;
+
+import com.pragma.bootcamps.capability.domain.spi.BootcampCapabilityPersistencePort;
+import com.pragma.bootcamps.capability.infrastructure.adapters.persistence.r2dbc.entities.BootcampCapabilityEntity;
+import com.pragma.bootcamps.capability.infrastructure.adapters.persistence.r2dbc.repositories.BootcampCapabilityReactiveRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class BootcampCapabilityPersistenceAdapter implements BootcampCapabilityPersistencePort  {
+
+    private final BootcampCapabilityReactiveRepository bootcampCapabilityReactiveRepository;
+    private final TransactionalOperator transactionalOperator;
+
+    @Override
+    public Mono<Void> saveAll(Long bootcampId, List<Long> capabilityIds) {
+        return Flux.fromIterable(capabilityIds)
+                .map(capId -> BootcampCapabilityEntity.builder()
+                        .bootcampId(bootcampId)
+                        .capabilityId(capId)
+                        .build())
+                .collectList()
+                .flatMapMany(bootcampCapabilityReactiveRepository::saveAll)
+                .then()
+                .as(transactionalOperator::transactional);
+    }
+
+}

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 import static reactor.netty.http.HttpConnectionLiveness.log;
 
 @Component
@@ -44,6 +46,11 @@ public class CapabilityPersistenceAdapter implements CapabilityPersistencePort {
         return capabilityReactiveRepository.findAllBy(pageRequest)
                 .map(mapper::toDomain)
                 .doOnNext(cap -> log.info("[DB RESULT] capability_id={}, name={}, technology_count={}", cap.getId(), cap.getName(), cap.getTechnologyCount()));
+    }
+
+    @Override
+    public Mono<Long> countByIds(List<Long> capabilityIds) {
+        return capabilityReactiveRepository.countByIdIn(capabilityIds);
     }
 
 }
