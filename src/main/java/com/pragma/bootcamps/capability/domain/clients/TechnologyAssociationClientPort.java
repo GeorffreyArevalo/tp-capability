@@ -9,4 +9,5 @@ import java.util.List;
 public interface TechnologyAssociationClientPort {
     Mono<Void> associateTechnologies(Long capabilityId, List<Long> technologyIds);
     Flux<TechnologySummary> getTechnologiesByCapabilityId(Long capabilityId);
+    Mono<Void> deleteTechnologiesByCapabilityIds(List<Long> capabilityIds);
 }

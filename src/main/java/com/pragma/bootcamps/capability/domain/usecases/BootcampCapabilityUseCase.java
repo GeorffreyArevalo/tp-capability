@@ -1,6 +1,7 @@
 package com.pragma.bootcamps.capability.domain.usecases;
 
 import com.pragma.bootcamps.capability.domain.api.BootcampCapabilityServicePort;
+import com.pragma.bootcamps.capability.domain.clients.TechnologyAssociationClientPort;
 import com.pragma.bootcamps.capability.domain.enums.ExceptionMessages;
 import com.pragma.bootcamps.capability.domain.exceptions.InvalidCountException;
 import com.pragma.bootcamps.capability.domain.exceptions.NotFoundException;
@@ -14,14 +15,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static com.pragma.bootcamps.capability.domain.constants.CapabilityConstants.MAX_CAPS;
-import static com.pragma.bootcamps.capability.domain.constants.CapabilityConstants.MIN_CAPS;
+import static com.pragma.bootcamps.capability.domain.constants.CapabilityConstants.*;
 
 @RequiredArgsConstructor
 public class BootcampCapabilityUseCase implements BootcampCapabilityServicePort {
 
     private final BootcampCapabilityPersistencePort bootcampCapabilityPersistencePort;
     private final CapabilityPersistencePort capabilityPersistencePort;
+    private final TechnologyAssociationClientPort technologyAssociationClientPort;
 
     @Override
     public Mono<Void> associateCapabilities(Long bootcampId, List<Long> capabilityIds) {
@@ -41,6 +42,38 @@ public class BootcampCapabilityUseCase implements BootcampCapabilityServicePort 
     public Flux<Capability> getCapabilitiesByBootcampId(Long bootcampId) {
         return bootcampCapabilityPersistencePort.findCapabilityIdsByBootcampId(bootcampId)
                 .flatMap(capabilityPersistencePort::findCapabilityById);
+    }
+
+    public Mono<Void> deleteAssociatedDataByBootcampId(Long bootcampId) {
+        return bootcampCapabilityPersistencePort.findCapabilityIdsByBootcampId(bootcampId)
+                .collectList()
+                .filter(associatedIds -> !associatedIds.isEmpty())
+                .flatMapMany(Flux::fromIterable)
+                .flatMap(this::identifyOrphanCapability)
+                .collectList()
+                .flatMap(this::executeCascadingDelete)
+                .then(bootcampCapabilityPersistencePort.deleteAssociationsByBootcampId(bootcampId));
+    }
+
+    private Mono<Long> identifyOrphanCapability(Long capabilityId) {
+        return bootcampCapabilityPersistencePort.countBootcampsByCapability(capabilityId)
+                .filter(usageCount -> usageCount <= SOLE_BOOTCAMP_ASSOCIATION)
+                .map(unused -> capabilityId);
+    }
+
+    private Mono<Void> executeCascadingDelete(List<Long> orphanCapabilityIds) {
+        return Mono.just(orphanCapabilityIds)
+                .filter(ids -> !ids.isEmpty())
+                .flatMap(ids -> deleteTechnologiesInCascade(ids)
+                        .then(deleteOrphanCapacities(ids)));
+    }
+
+    private Mono<Void> deleteTechnologiesInCascade(List<Long> orphanCapabilityIds) {
+        return technologyAssociationClientPort.deleteTechnologiesByCapabilityIds(orphanCapabilityIds);
+    }
+
+    private Mono<Void> deleteOrphanCapacities(List<Long> orphanCapabilityIds) {
+        return capabilityPersistencePort.deleteCapabilitiesByIds(orphanCapabilityIds);
     }
 
     private boolean isValidCapabilitiesCount(List<Long> capsIds, int min, int max) {

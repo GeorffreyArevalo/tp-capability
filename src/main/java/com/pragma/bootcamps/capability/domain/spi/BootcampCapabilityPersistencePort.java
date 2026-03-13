@@ -8,4 +8,6 @@ import java.util.List;
 public interface BootcampCapabilityPersistencePort {
     Mono<Void> saveAll(Long bootcampId, List<Long> capabilityIds);
     Flux<Long> findCapabilityIdsByBootcampId(Long bootcampId);
+    Mono<Long> countBootcampsByCapability(Long capabilityId);
+    Mono<Void> deleteAssociationsByBootcampId(Long bootcampId);
 }

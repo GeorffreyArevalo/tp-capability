@@ -10,5 +10,6 @@ public interface BootcampCapabilityServicePort {
 
     Mono<Void> associateCapabilities(Long bootcampId, List<Long> capabilityIds);
     Flux<Capability> getCapabilitiesByBootcampId(Long bootcampId);
+    Mono<Void> deleteAssociatedDataByBootcampId(Long bootcampId);
 
 }

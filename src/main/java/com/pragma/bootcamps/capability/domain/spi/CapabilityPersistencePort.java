@@ -14,4 +14,5 @@ public interface CapabilityPersistencePort {
     Flux<Capability> findCapabilitiesPagedAndSorted(int page, int size, String sortBy, String order);
     Mono<Long> countByIds(List<Long> capabilityIds);
     Mono<Capability> findCapabilityById(Long capabilityId);
+    Mono<Void> deleteCapabilitiesByIds(List<Long> capabilityIds);
 }
