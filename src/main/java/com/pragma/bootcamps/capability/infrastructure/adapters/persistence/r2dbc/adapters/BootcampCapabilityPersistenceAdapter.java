@@ -40,4 +40,17 @@ public class BootcampCapabilityPersistenceAdapter implements BootcampCapabilityP
                 .doOnNext(id -> log.info("[DB] findCapabilityIdsByBootcampId({}): capabilityId={}", bootcampId, id));
     }
 
+    @Override
+    public Mono<Long> countBootcampsByCapability(Long capabilityId) {
+        return bootcampCapabilityReactiveRepository.countByCapabilityId(capabilityId)
+                .doOnNext(count -> log.info("[DB] countBootcampsForCapability({}): count={}", capabilityId, count));
+    }
+
+    @Override
+    public Mono<Void> deleteAssociationsByBootcampId(Long bootcampId) {
+        return bootcampCapabilityReactiveRepository.deleteAllByBootcampId(bootcampId)
+                .doOnSuccess(unused -> log.info("[DB] deleteAssociationsByBootcampId para bootcampId={}", bootcampId))
+                .as(transactionalOperator::transactional);
+    }
+
 }
