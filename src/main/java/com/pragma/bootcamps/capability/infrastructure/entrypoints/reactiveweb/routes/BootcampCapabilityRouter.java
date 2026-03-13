@@ -21,6 +21,7 @@ public class BootcampCapabilityRouter {
     public RouterFunction<ServerResponse> routerFunctionCapabilityTechnology(BootcampCapabilityHandler handler) {
         return route()
                 .POST(capabilityPath.getAssociateCapabilities(), handler::listenAssociateCapabilities, BootcampCapabilityOpenApi::associateCapabilities)
+                .GET(capabilityPath.getCapabilitiesByBootcampId(), handler::listenGetCapabilitiesByBootcampId, BootcampCapabilityOpenApi::getCapabilitiesByBootcampId)
                 .build();
     }
 

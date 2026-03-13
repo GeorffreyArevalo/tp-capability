@@ -3,6 +3,7 @@ package com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.h
 import com.pragma.bootcamps.capability.domain.api.BootcampCapabilityServicePort;
 import com.pragma.bootcamps.capability.domain.enums.ExceptionStatusCode;
 import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.dtos.requests.BootcampCapabilityRequest;
+import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.mappers.CapabilityRequestMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import static com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiv
 public class BootcampCapabilityHandler {
 
     private final BootcampCapabilityServicePort bootcampCapabilityServicePort;
+    private final CapabilityRequestMapper mapper;
 
     public Mono<ServerResponse> listenAssociateCapabilities(ServerRequest serverRequest) {
         return serverRequest.bodyToMono(BootcampCapabilityRequest.class)
@@ -31,6 +33,16 @@ public class BootcampCapabilityHandler {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(buildBodySuccessResponse(ExceptionStatusCode.CREATED.status(), null))
                 );
+    }
+
+    public Mono<ServerResponse> listenGetCapabilitiesByBootcampId(ServerRequest request) {
+        Long bootcampId = Long.valueOf(request.pathVariable("bootcampId"));
+        return bootcampCapabilityServicePort.getCapabilitiesByBootcampId(bootcampId)
+                .map(mapper::toCapabilitySummaryResponse)
+                .collectList()
+                .flatMap(list -> ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(buildBodySuccessResponse(ExceptionStatusCode.OK.status(), list)));
     }
 
 }

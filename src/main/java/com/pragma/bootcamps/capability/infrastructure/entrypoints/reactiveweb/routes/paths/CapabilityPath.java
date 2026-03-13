@@ -10,6 +10,7 @@ public class CapabilityPath {
     private final String capabilities;
     private final String capabilitiesList;
     private final String associateCapabilities;
+    private final String capabilitiesByBootcampId;
 
 
 }

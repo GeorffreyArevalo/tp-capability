@@ -2,6 +2,7 @@ package com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.d
 
 import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.dtos.requests.BootcampCapabilityRequest;
 import com.pragma.bootcamps.capability.infrastructure.entrypoints.reactiveweb.dtos.responses.BusinessResponse;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.experimental.UtilityClass;
 import org.springdoc.core.fn.builders.operation.Builder;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.MediaType;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 
@@ -28,6 +30,13 @@ public class BootcampCapabilityOpenApi {
 
     private static final String OPERATION_ASSOCIATE = "associateCapabilities";
     private static final String OPERATION_DESC = "Associates a list of capabilities to an existing bootcamp.";
+
+    private static final String OPERATION_GET_CAPS_BY_BOOTCAMP = "getCapabilitiesByBootcampId";
+    private static final String OPERATION_GET_CAPS_DESC = "Get all capabilities associated with a bootcamp by its ID.";
+    private static final String RESPONSE_CAP_LIST_DESC = "List of CapabilitySummaryDto";
+    private static final String PARAM_BOOTCAMP_ID = "bootcampId";
+    private static final String PARAM_BOOTCAMP_ID_DESC = "Bootcamp ID to search associated capabilities";
+
 
     public void associateCapabilities(Builder builder) {
         builder
@@ -68,6 +77,32 @@ public class BootcampCapabilityOpenApi {
                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                 .schema(schemaBuilder()
                                         .implementation(BusinessResponse.class))));
+    }
+
+
+    public void getCapabilitiesByBootcampId(Builder builder) {
+        builder
+                .operationId(OPERATION_GET_CAPS_BY_BOOTCAMP)
+                .description(OPERATION_GET_CAPS_DESC)
+                .tag(TAG)
+                .parameter(parameterBuilder()
+                        .name(PARAM_BOOTCAMP_ID)
+                        .description(PARAM_BOOTCAMP_ID_DESC)
+                        .in(ParameterIn.PATH)
+                        .required(true))
+                .response(responseBuilder()
+                        .responseCode(OK_CODE)
+                        .description(RESPONSE_CAP_LIST_DESC)
+                        .content(contentBuilder()
+                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                                .schema(schemaBuilder()
+                                        .implementation(BusinessResponse.class))))
+                .response(responseBuilder()
+                        .responseCode(NOT_FOUND_CODE)
+                        .description(NOT_FOUND_DESC))
+                .response(responseBuilder()
+                        .responseCode(INTERNAL_ERROR_CODE)
+                        .description(INTERNAL_ERROR_DESC));
     }
 
 }
