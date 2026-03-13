@@ -9,7 +9,7 @@ public class CapabilityPath {
 
     private final String capabilities;
     private final String capabilitiesList;
-    private String associateCapabilities;
+    private final String associateCapabilities;
 
 
 }
