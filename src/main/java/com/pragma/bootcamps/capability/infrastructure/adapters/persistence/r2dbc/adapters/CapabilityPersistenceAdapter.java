@@ -53,4 +53,11 @@ public class CapabilityPersistenceAdapter implements CapabilityPersistencePort {
         return capabilityReactiveRepository.countByIdIn(capabilityIds);
     }
 
+    @Override
+    public Mono<Capability> findCapabilityById(Long capabilityId) {
+        return capabilityReactiveRepository.findById(capabilityId)
+                .map(mapper::toDomain)
+                .doOnNext(cap -> log.info("[DB RESULT] findCapabilityById({}): id={}, name={}, technology_count={}", capabilityId, cap.getId(), cap.getName(), cap.getTechnologyCount()));
+    }
+
 }

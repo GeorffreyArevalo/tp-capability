@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BootcampCapabilityPersistenceAdapter implements BootcampCapabilityPersistencePort  {
@@ -30,6 +31,13 @@ public class BootcampCapabilityPersistenceAdapter implements BootcampCapabilityP
                 .flatMapMany(bootcampCapabilityReactiveRepository::saveAll)
                 .then()
                 .as(transactionalOperator::transactional);
+    }
+
+    @Override
+    public Flux<Long> findCapabilityIdsByBootcampId(Long bootcampId) {
+        return bootcampCapabilityReactiveRepository.findAllByBootcampId(bootcampId)
+                .map(BootcampCapabilityEntity::getCapabilityId)
+                .doOnNext(id -> log.info("[DB] findCapabilityIdsByBootcampId({}): capabilityId={}", bootcampId, id));
     }
 
 }
