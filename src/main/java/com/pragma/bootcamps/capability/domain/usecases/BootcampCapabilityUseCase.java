@@ -5,9 +5,11 @@ import com.pragma.bootcamps.capability.domain.enums.ExceptionMessages;
 import com.pragma.bootcamps.capability.domain.exceptions.InvalidCountException;
 import com.pragma.bootcamps.capability.domain.exceptions.NotFoundException;
 import com.pragma.bootcamps.capability.domain.exceptions.RepeatedCapabilitiesException;
+import com.pragma.bootcamps.capability.domain.models.Capability;
 import com.pragma.bootcamps.capability.domain.spi.BootcampCapabilityPersistencePort;
 import com.pragma.bootcamps.capability.domain.spi.CapabilityPersistencePort;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -34,6 +36,11 @@ public class BootcampCapabilityUseCase implements BootcampCapabilityServicePort 
                         .thenReturn(ids))
                 .flatMap(ids -> bootcampCapabilityPersistencePort.saveAll(bootcampId, ids))
                 .then().log();
+    }
+
+    public Flux<Capability> getCapabilitiesByBootcampId(Long bootcampId) {
+        return bootcampCapabilityPersistencePort.findCapabilityIdsByBootcampId(bootcampId)
+                .flatMap(capabilityPersistencePort::findCapabilityById);
     }
 
     private boolean isValidCapabilitiesCount(List<Long> capsIds, int min, int max) {
