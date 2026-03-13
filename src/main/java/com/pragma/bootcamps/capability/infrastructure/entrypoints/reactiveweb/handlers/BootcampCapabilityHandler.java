@@ -45,4 +45,13 @@ public class BootcampCapabilityHandler {
                         .bodyValue(buildBodySuccessResponse(ExceptionStatusCode.OK.status(), list)));
     }
 
+    public Mono<ServerResponse> listenDeleteAssociatedDataByBootcampId(ServerRequest request) {
+        Long bootcampId = Long.valueOf(request.pathVariable("bootcampId"));
+        log.info("[HANDLER] Received request to delete bootcamp with id: {}", bootcampId);
+        return bootcampCapabilityServicePort.deleteAssociatedDataByBootcampId(bootcampId)
+                .then(ServerResponse.noContent().build())
+                .doOnSuccess(resp -> log.info("[HANDLER] Bootcamp {} Delete associated successfully (cascade)", bootcampId))
+                .doOnError(e -> log.error("[HANDLER] Error deleting bootcamp {}: {}", bootcampId, e.getMessage()));
+    }
+
 }

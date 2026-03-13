@@ -29,6 +29,7 @@ routes:
     capabilities-list: "/api/v1/capabilities/list"
     associate-capabilities: "/api/v1/capabilities/bootcamp-associations"
     capabilities-by-bootcamp-id: "/api/v1/capability/botcamps/{bootcampId}/capabilities"
+    delete-bootcamp-cascade: "/api/v1/capability/bootcamps/{bootcampId}"
 
 
 

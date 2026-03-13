@@ -22,11 +22,13 @@ public class BootcampCapabilityOpenApi {
     private static final String BAD_REQUEST_CODE = String.valueOf(HttpStatus.BAD_REQUEST.value());
     private static final String NOT_FOUND_CODE = String.valueOf(HttpStatus.NOT_FOUND.value());
     private static final String INTERNAL_ERROR_CODE = String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    private static final String NO_CONTENT_CODE = String.valueOf(HttpStatus.NO_CONTENT.value());
 
     private static final String OK_DESC = "Association successful";
     private static final String BAD_REQUEST_DESC = "Invalid request";
     private static final String NOT_FOUND_DESC = "Not found";
     private static final String INTERNAL_ERROR_DESC = "Internal server error";
+    private static final String NO_CONTENT_DESC = "No Content - Bootcamp and associations deleted successfully.";
 
     private static final String OPERATION_ASSOCIATE = "associateCapabilities";
     private static final String OPERATION_DESC = "Associates a list of capabilities to an existing bootcamp.";
@@ -36,6 +38,9 @@ public class BootcampCapabilityOpenApi {
     private static final String RESPONSE_CAP_LIST_DESC = "List of CapabilitySummaryDto";
     private static final String PARAM_BOOTCAMP_ID = "bootcampId";
     private static final String PARAM_BOOTCAMP_ID_DESC = "Bootcamp ID to search associated capabilities";
+
+    private static final String OPERATION_DELETE_BOOTCAMP_CASCADE = "deleteAssociatedDataByBootcampId";
+    private static final String OPERATION_DELETE_BOOTCAMP_CASCADE_DESC = "Deletes all associations and orphan capabilities for a bootcamp (cascading delete).";
 
 
     public void associateCapabilities(Builder builder) {
@@ -97,6 +102,27 @@ public class BootcampCapabilityOpenApi {
                                 .mediaType(MediaType.APPLICATION_JSON_VALUE)
                                 .schema(schemaBuilder()
                                         .implementation(BusinessResponse.class))))
+                .response(responseBuilder()
+                        .responseCode(NOT_FOUND_CODE)
+                        .description(NOT_FOUND_DESC))
+                .response(responseBuilder()
+                        .responseCode(INTERNAL_ERROR_CODE)
+                        .description(INTERNAL_ERROR_DESC));
+    }
+
+    public void deleteAssociatedDataByBootcampId(Builder builder) {
+        builder
+                .operationId(OPERATION_DELETE_BOOTCAMP_CASCADE)
+                .description(OPERATION_DELETE_BOOTCAMP_CASCADE_DESC)
+                .tag(TAG)
+                .parameter(parameterBuilder()
+                        .name(PARAM_BOOTCAMP_ID)
+                        .description(PARAM_BOOTCAMP_ID_DESC)
+                        .in(ParameterIn.PATH)
+                        .required(true))
+                .response(responseBuilder()
+                        .responseCode(NO_CONTENT_CODE)
+                        .description(NO_CONTENT_DESC))
                 .response(responseBuilder()
                         .responseCode(NOT_FOUND_CODE)
                         .description(NOT_FOUND_DESC))

@@ -11,6 +11,7 @@ public class CapabilityPath {
     private final String capabilitiesList;
     private final String associateCapabilities;
     private final String capabilitiesByBootcampId;
+    private final String deleteBootcampCascade;
 
 
 }
